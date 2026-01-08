@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Крестики-нолики 💖</title>
-    <script src="https://1acrimosa.github.io/vibecode-task/"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #ffb6c1, #f8b8d9, #e0bbe4);
             min-height: 100vh;
             display: flex;
@@ -20,352 +20,319 @@
             align-items: center;
             justify-content: center;
             color: #333;
-            overflow: hidden;
+            overflow-x: hidden;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+            width: 90vw;
+            padding: 20px;
         }
         h1 {
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            color: #ff69b4;
-            text-shadow: 0 0 10px rgba(255,105,180,0.5);
-            margin-bottom: 1rem;
+            font-size: 2.2rem;
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
             animation: glow 2s ease-in-out infinite alternate;
         }
         @keyframes glow {
-            from { text-shadow: 0 0 10px rgba(255,105,180,0.5); }
-            to { text-shadow: 0 0 20px rgba(255,105,180,0.8), 0 0 30px rgba(255,105,180,0.4); }
+            from { filter: drop-shadow(0 0 5px #ff69b4); }
+            to { filter: drop-shadow(0 0 20px #ff1493); }
         }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-        .status {
-            font-size: 1.2rem;
+        #status {
+            font-size: 1.3rem;
             font-weight: bold;
             color: #ff1493;
-            min-height: 1.5rem;
+            margin-bottom: 20px;
+            min-height: 1.8rem;
         }
-        .game {
+        .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0.8rem;
-            padding: 1rem;
+            gap: 12px;
             background: rgba(255,255,255,0.9);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(255,182,193,0.4);
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(255,105,180,0.3);
             backdrop-filter: blur(10px);
         }
-        .box {
-            aspect-ratio: 1;
+        .cell {
+            width: 100px;
+            height: 100px;
             border: none;
             background: linear-gradient(145deg, #ffe4e1, #fff0f5);
-            border-radius: 15px;
-            font-size: clamp(2rem, 8vw, 4rem);
+            border-radius: 20px;
+            font-size: 3.5rem;
             font-weight: bold;
             color: #ff69b4;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255,105,180,0.3);
+            box-shadow: 0 8px 20px rgba(255,105,180,0.2);
             position: relative;
             overflow: hidden;
         }
-        .box:hover:not(:disabled) {
+        .cell:hover:not(.disabled) {
             transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(255,105,180,0.5);
             background: linear-gradient(145deg, #ffddf5, #ffeef8);
+            box-shadow: 0 12px 30px rgba(255,105,180,0.4);
         }
-        .box:disabled {
+        .cell:active:not(.disabled) {
+            transform: scale(0.98);
+        }
+        .cell.disabled {
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.7;
+            background: #f0f0f0;
         }
-        .box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.5s;
-        }
-        .box:hover::before {
-            left: 100%;
-        }
-        .promo-section {
-            background: rgba(255,255,255,0.95);
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(255,182,193,0.3);
+        .result {
             display: none;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(255,182,193,0.4);
         }
         .promo-code {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #ff1493;
             background: linear-gradient(145deg, #fff, #f8f8f8);
-            padding: 0.8rem 1.5rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-            letter-spacing: 0.3rem;
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin: 15px 0;
+            letter-spacing: 4px;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.1);
         }
-        .retry-btn, .new-game-btn {
+        .btn {
             background: linear-gradient(145deg, #ff69b4, #ff1493);
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 25px;
+            padding: 12px 30px;
+            border-radius: 30px;
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 8px 20px rgba(255,105,180,0.4);
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255,105,180,0.4);
-            margin: 0.5rem;
         }
-        .retry-btn:hover, .new-game-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255,105,180,0.6);
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255,105,180,0.6);
         }
         .hearts {
             position: fixed;
-            top: 0;
-            left: 0;
             pointer-events: none;
-            z-index: 1000;
             font-size: 2rem;
-            animation: float 3s linear infinite;
+            z-index: 1000;
+            animation: floatHearts 4s linear infinite;
         }
-        @keyframes float {
+        @keyframes floatHearts {
             0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
-        #reset {
-            background: linear-gradient(145deg, #98d8c8, #87ceeb);
-            color: #333;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 20px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 1rem;
-            box-shadow: 0 4px 15px rgba(152,216,200,0.4);
-        }
-        #reset:hover {
-            transform: scale(1.05);
+            100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
         }
     </style>
 </head>
 <body>
-<h1>Крестики-нолики 💖✨</h1>
 <div class="container">
-    <div class="status" id="status">Ваш ход 💕</div>
-    <div class="game" id="game">
-    </div>
-    
-    <button id="reset">Новая игра 🌸</button>
-    <div class="promo-section" id="promoWin">
-        <h2>Победа! 🏆✨</h2>
-        <div>Ваш промокод на скидку:</div>
+    <h1>Крестики-нолики 💖</h1>
+    <div id="status">Ваш ход! ✨</div>
+
+    <div class="board" id="board"></div>
+
+    <div class="result" id="winResult">
+        <h2>🎉 Победа! 🏆</h2>
+        <div>Ваш промокод:</div>
         <div class="promo-code" id="promoCode"></div>
-        <button class="new-game-btn" id="newGameWin">Играть еще 💖</button>
+        <button class="btn" onclick="newGame()">Играть еще 💕</button>
     </div>
-    <div class="promo-section" id="promoLose" style="display: none;">
-        <h2>Попробуй еще раз! 💕</h2>
-        <button class="retry-btn" id="retryLose">Сыграть еще раз 🌺</button>
+
+    <div class="result" id="loseResult" style="display: none;">
+        <h2>😊 Компьютер выиграл!</h2>
+        <button class="btn" onclick="newGame()">Сыграть еще раз 🌸</button>
+    </div>
+
+    <div class="result" id="drawResult" style="display: none;">
+        <h2>🤝 Ничья!</h2>
+        <button class="btn" onclick="newGame()">Новая игра ✨</button>
     </div>
 </div>
 
 <script>
-    let tg = null;
-    try {
-        tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-            console.log('Telegram WebApp OK');
-        }
-    } catch(e) {
-        console.log('Not Telegram - normal browser');
+    let tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.ready();
+        tg.expand();
+        document.body.style.background = `linear-gradient(135deg, ${tg.themeParams?.bg_color || '#ffb6c1'}, ${tg.themeParams?.secondary_bg_color || '#f8b8d9'})`;
     }
 
-    let board = Array(9).fill(null);
+    let board = ['', '', '', '', '', '', '', '', ''];
     let currentPlayer = 'X';
     let gameActive = true;
-    const winPatterns = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
+    let gameStatus = document.getElementById('status');
+    let boardEl = document.getElementById('board');
+
+    const winningConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // строки
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // столбцы
+        [0, 4, 8], [2, 4, 6] // диагонали
     ];
 
-    const boxes = [];
-    const gameEl = document.getElementById('game');
-    const statusEl = document.getElementById('status');
-    const promoWinEl = document.getElementById('promoWin');
-    const promoLoseEl = document.getElementById('promoLose');
-    const promoCodeEl = document.getElementById('promoCode');
-
-    for (let i = 0; i < 9; i++) {
-        const box = document.createElement('button');
-        box.className = 'box';
-        box.dataset.index = i;
-        box.addEventListener('click', handlePlayerClick);
-        gameEl.appendChild(box);
-        boxes.push(box);
+    function createBoard() {
+        boardEl.innerHTML = '';
+        board.forEach((_, index) => {
+            const cell = document.createElement('button');
+            cell.className = 'cell';
+            cell.dataset.index = index;
+            cell.addEventListener('click', handleCellClick);
+            boardEl.appendChild(cell);
+        });
     }
 
-    function handlePlayerClick(e) {
+    function handleCellClick(e) {
         const index = parseInt(e.target.dataset.index);
-        console.log('Click:', index, board[index]); // DEBUG
 
-        if (board[index] || !gameActive || currentPlayer !== 'X') return;
-
-        makeMove(index, 'X');
-        if (gameActive) {
-            setTimeout(computerMove, 500);
-        }
-    }
-
-    function makeMove(index, player) {
-        board[index] = player;
-        boxes[index].textContent = player === 'X' ? '✨' : '💖';
-        boxes[index].style.color = player === 'X' ? '#ff69b4' : '#ff1493';
-        boxes[index].disabled = true;
-
-        if (checkWin(player)) {
-            endGame(player === 'X' ? 'win' : 'lose');
+        if (board[index] !== '' || !gameActive || currentPlayer !== 'X') {
             return;
         }
-        if (board.every(cell => cell)) {
+
+        board[index] = 'X';
+        e.target.textContent = '✨';
+        e.target.classList.add('disabled');
+
+        if (checkWinner('X')) {
+            endGame('win');
+            sendToTelegram('victory');
+            return;
+        }
+
+        if (board.every(cell => cell !== '')) {
             endGame('draw');
             return;
         }
 
-        currentPlayer = player === 'X' ? 'O' : 'X';
-        statusEl.textContent = currentPlayer === 'X' ? 'Ваш ход 💕' : 'Ход компьютера 🤖';
+        currentPlayer = 'O';
+        gameStatus.textContent = 'Ход компьютера 🤖';
+        setTimeout(computerMove, 800);
     }
 
     function computerMove() {
-        if (!gameActive) return;
-        const bestMove = minimax(board, 'O').index;
-        makeMove(bestMove, 'O');
+        let bestMove = Math.floor(Math.random() * 9);
+
+        for (let i = 0; i < 9; i++) {
+            if (board[i] === '') {
+                board[i] = 'O';
+                if (checkWinner('O')) {
+                    makeComputerMove(i);
+                    return;
+                }
+                board[i] = '';
+            }
+        }
+
+        for (let i = 0; i < 9; i++) {
+            if (board[i] === '') {
+                board[i] = 'X';
+                if (checkWinner('X')) {
+                    board[i] = '';
+                    makeComputerMove(i);
+                    return;
+                }
+                board[i] = '';
+            }
+        }
+
+        while (board[bestMove] !== '') {
+            bestMove = Math.floor(Math.random() * 9);
+        }
+        makeComputerMove(bestMove);
     }
 
-    function checkWin(player) {
-        return winPatterns.some(pattern =>
-            pattern.every(index => board[index] === player)
-        );
+    function makeComputerMove(index) {
+        board[index] = 'O';
+        const cell = document.querySelector(`[data-index="${index}"]`);
+        cell.textContent = '💖';
+        cell.classList.add('disabled');
+
+        if (checkWinner('O')) {
+            endGame('lose');
+            sendToTelegram('defeat');
+            return;
+        }
+
+        if (board.every(cell => cell !== '')) {
+            endGame('draw');
+            return;
+        }
+
+        currentPlayer = 'X';
+        gameStatus.textContent = 'Ваш ход! 💕';
+    }
+
+    function checkWinner(player) {
+        return winningConditions.some(condition => {
+            return condition.every(index => board[index] === player);
+        });
     }
 
     function endGame(result) {
         gameActive = false;
-        if (result === 'win') {
-            const promoCode = 'PROMO' + Math.floor(10000 + Math.random() * 90000);
-            promoCodeEl.textContent = promoCode;
-            promoWinEl.style.display = 'block';
-            statusEl.style.display = 'none';
+        gameStatus.style.display = 'none';
 
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify({action: 'victory', code: promoCode}));
-            } else {
-                alert(`🎉 Победа! Промокод: ${promoCode}`);
-                console.log(`Отправка боту: Победа! Промокод: ${promoCode}`);
-            }
-            createHearts();
+        if (result === 'win') {
+            document.getElementById('winResult').style.display = 'block';
+            const promoCode = 'PROMO' + Math.floor(10000 + Math.random() * 90000);
+            document.getElementById('promoCode').textContent = promoCode;
+            celebrateWin();
         } else if (result === 'lose') {
-            promoLoseEl.style.display = 'block';
-            statusEl.textContent = 'Компьютер выиграл! 😊';
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify({action: 'defeat'}));
-            } else {
-                console.log('Отправка боту: Проигрыш');
-            }
+            document.getElementById('loseResult').style.display = 'block';
         } else {
-            statusEl.textContent = 'Ничья! 🤝';
+            document.getElementById('drawResult').style.display = 'block';
         }
     }
 
-    function createHearts() {
-        for (let i = 0; i < 10; i++) {
+    function celebrateWin() {
+        for (let i = 0; i < 15; i++) {
             setTimeout(() => {
                 const heart = document.createElement('div');
                 heart.textContent = '💖';
                 heart.className = 'hearts';
                 heart.style.left = Math.random() * 100 + '%';
-                heart.style.animationDuration = (2 + Math.random() * 3) + 's';
+                heart.style.animationDuration = (3 + Math.random() * 2) + 's';
                 document.body.appendChild(heart);
                 setTimeout(() => heart.remove(), 5000);
-            }, i * 200);
+            }, i * 150);
         }
     }
 
-    function minimax(newBoard, player) {
-        const availSpots = newBoard.map((s, i) => s ? null : i).filter(v => v !== null);
-
-        if (checkWin('X')) return {score: -10};
-        if (checkWin('O')) return {score: 10};
-        if (availSpots.length === 0) return {score: 0};
-
-        const moves = [];
-        for (let i of availSpots) {
-            const move = {};
-            move.index = i;
-            newBoard[i] = player;
-
-            if (player === 'O') {
-                const result = minimax(newBoard, 'X');
-                move.score = result.score;
+    function sendToTelegram(action) {
+        if (tg && tg.sendData) {
+            if (action === 'victory') {
+                const promoCode = document.getElementById('promoCode').textContent;
+                tg.sendData(JSON.stringify({action: 'victory', code: promoCode}));
             } else {
-                const result = minimax(newBoard, 'O');
-                move.score = result.score;
-            }
-
-            newBoard[i] = null;
-            moves.push(move);
-        }
-
-        let bestMove;
-        if (player === 'O') {
-            let bestScore = -Infinity;
-            for (let i = 0; i < moves.length; i++) {
-                if (moves[i].score > bestScore) {
-                    bestScore = moves[i].score;
-                    bestMove = moves[i];
-                }
-            }
-        } else {
-            let bestScore = Infinity;
-            for (let i = 0; i < moves.length; i++) {
-                if (moves[i].score < bestScore) {
-                    bestScore = moves[i].score;
-                    bestMove = moves[i];
-                }
+                tg.sendData(JSON.stringify({action: 'defeat'}));
             }
         }
-        return bestMove;
     }
 
-    document.getElementById('reset').addEventListener('click', resetGame);
-    document.getElementById('newGameWin').addEventListener('click', resetGame);
-    document.getElementById('retryLose').addEventListener('click', resetGame);
-
-    function resetGame() {
-        board = Array(9).fill(null);
+    function newGame() {
+        board = ['', '', '', '', '', '', '', '', ''];
         currentPlayer = 'X';
         gameActive = true;
-        statusEl.textContent = 'Ваш ход 💕';
-        statusEl.style.display = 'block';
-        promoWinEl.style.display = 'none';
-        promoLoseEl.style.display = 'none';
-        boxes.forEach((box, i) => {
-            box.textContent = '';
-            box.disabled = false;
-            box.style.color = '';
+        gameStatus.textContent = 'Ваш ход! 💕';
+        gameStatus.style.display = 'block';
+
+        document.querySelectorAll('.result').forEach(el => {
+            el.style.display = 'none';
         });
+
+        createBoard();
     }
 
-    console.log('Игра готова! Кликайте по клеткам 💖');
+    createBoard();
+    gameStatus.textContent = 'Ваш ход! 💕';
 </script>
-
 </body>
 </html>
